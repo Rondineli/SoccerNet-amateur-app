@@ -1,7 +1,7 @@
 "use client";
 
 import Sal from "sal.js";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 import shapeOne from "../../public/images/bg/icon-shape/icon-shape-one.png";
@@ -58,14 +58,17 @@ const modelConfigTranslations = {
 
 
 function VideosPage({videoUrls}) {
-
+  console.log(`[RDEBUG] RECEIVED => ${JSON.stringify(videoUrls)}`);
   const [cutConfidence, setCutConfidence] = useState(0);
+  const [rows, setRows] = useState([]);
+
+  const getFileName = (url) => url.split("/").pop();
 
   const getLabelSecondsName = (videoName) => {
-    const nameWithoutExt = videoName.replace(/\.[^/.]+$/, "");
+    const nameWithoutExt = getFileName(videoName);
     const parts = nameWithoutExt.split("_");
 
-    const label = parts[1].split(":")[1];
+    const label = parts[1].split("l:")[1];
     const time = parts[2].split("s:")[1];
 
     const conf = parts[3].split(":")[1];
@@ -74,23 +77,33 @@ function VideosPage({videoUrls}) {
     return `${label} ${time} ${parseFloat(conf).toFixed(3)}`;
   }
 
-  const maxConfidence = Math.max(
-    ...videoUrls.map((videoName) => {
-      const nameWithoutExt = videoName.replace(/\.[^/.]+$/, "");
+  const maxConfidence = React.useMemo(() => {
+    if (!videoUrls?.length) return 0;
+  
+    const values = videoUrls.map((videoUrl) => {
+      const fileName = getFileName(videoUrl);
+      const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
       const parts = nameWithoutExt.split("_");
-      const conf = parts[3].split(":")[1];
-      return parseFloat(conf);
-    })
-  );
+  
+      const confPart = parts.find(p => p.startsWith("c:"));
+      return confPart ? parseFloat(confPart.split(":")[1]) : 0;
+    });
+  
+    return Math.max(...values);
+  }, [videoUrls]);
 
-  const getConfidenceCut = (videoName) => {
-    const nameWithoutExt = videoName.replace(/\.[^/.]+$/, "");
+  const getConfidenceCut = (videoUrl) => {
+    const fileName = getFileName(videoUrl);
+    const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
     const parts = nameWithoutExt.split("_");
-    const conf = parts[3].split(":")[1];
-    const parsedConf = parseFloat(conf);
-    console.log(`Validating: ${videoName} confidences: ${parsedConf}, should display: ${parseFloat(conf) >= parseFloat(cutConfidence)}`)
-    return parseFloat(conf) >= parseFloat(cutConfidence);
-  }
+  
+    const confPart = parts.find(p => p.startsWith("c:"));
+    if (!confPart) return false;
+  
+    const parsedConf = parseFloat(confPart.split(":")[1]);
+    return parsedConf >= parseFloat(cutConfidence);
+  };
+  
 
   const chunkArray = (array, size) => {
     const result = [];
@@ -100,30 +113,38 @@ function VideosPage({videoUrls}) {
     return result;
   };
 
-  const filteredVideos = videoUrls?.filter((videoUrl) =>
-    getConfidenceCut(videoUrl)
-  );
+  useEffect(() => {
+    if (!videoUrls?.length) return;
   
-  const rows = chunkArray(filteredVideos, 3);
+    const filteredVideos = videoUrls.filter(getConfidenceCut);
+    setRows(chunkArray(filteredVideos, 3));
+  }, [videoUrls, cutConfidence]);
   
-
-  console.log(`f===> ${JSON.stringify(videoUrls)}`)
+  
+  useEffect(() => {
+    console.log("[RDEBUG] ROWS UPDATED =>", rows);
+  }, [rows]);
 
   return (
-    <div className="col-lg-12 justify-content-center align-items-center" style={{ height: '100%' }}>
+    <div className="col-lg-12 justify-content-center align-items-center" >
       <Grid className="justify-content-center align-items-center" container columns={1} spacing={6}>
         {videoUrls.length === 0 ? (
           <h4> No clips or results from inference, try another id....</h4>
         ) : (
           <>
-            <h4>Confidence Filter: {parseFloat(cutConfidence).toFixed(3)}</h4>
+            <Typography variant="h6" style={{ color: "#fff", marginTop: "100px" }}>
+  Confidence Filter: {cutConfidence.toFixed(3)}
+            </Typography>
+
             <Slider
               sx={{ mt: 1 }}
               min={0}
               max={maxConfidence}
-              step={0.01}
-              value={Math.min(cutConfidence, maxConfidence)}
-              onChange={(_, value) => setCutConfidence(value)}
+              step={0.001}
+              value={cutConfidence}
+              onChange={(_, value) =>
+                setCutConfidence(Array.isArray(value) ? value[0] : value)
+              }
             />
           </>
         )}
@@ -255,7 +276,7 @@ export default function StatusPanel({ loading, data, modelType}) {
 
   
 
-  if ((data[envModelSet]?.s3_objects_list && data[envModelSet].s3_objects_list.length > 0)  || data.status === "finished") {
+  if ((data[envModelSet]?.s3_objects_list && data[envModelSet].s3_objects_list.length > 0) || data.status === "finished") {
     return (
       <div className="col-lg-12 justify-content-center align-items-center">
         <VideosPage videoUrls={data[envModelSet]?.s3_objects_list} />
@@ -265,7 +286,7 @@ export default function StatusPanel({ loading, data, modelType}) {
 
   return (
     <>
-      <div className="inner text-center" style={{ top: "100px" }}>
+      <div className="inner text-center" style={{ top: "30px" }}>
         <h1 className="title display-one flex flex-col12 items-center justify-center text-center" style={{ width: "100vh !important", maxWidth: "100vh !important" }}>
           <span className="text-6xl sm:text-6xl lg:text-6xl font-bold">...We Are{" "}</span>
           <br/>
@@ -313,7 +334,8 @@ export default function StatusPanel({ loading, data, modelType}) {
                     whiteSpace: 'normal',
                     maxWidth: '90vw',
                   }} className={"force-center"}>
-                    {item.text}
+                    {item.text} {
+                    idx === 0 ? `${data?.progress || 0}%`: ''}
                   </p>
                   <Image
                     src={isLightTheme ? item.image : item.image_light}

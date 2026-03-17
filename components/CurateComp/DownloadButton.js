@@ -22,6 +22,8 @@ export default function DownloadButton({youtubeUrl, setUrl}) {
     });
 
     const data = await res.json();
+
+    console.log(`[DEBUG] => JOBID: ${JSON.stringify(data)}`)
     setJobId(data.jobId);
     setOpen(true);
   };
@@ -33,12 +35,15 @@ export default function DownloadButton({youtubeUrl, setUrl}) {
     const interval = setInterval(async () => {
       const res = await fetch(`/api/videos/downloadStatus?jobId=${jobId}`);
       const data = await res.json();
+
+      console.log(`Final data: ${JSON.stringify(data)}`)
       setStatus(data);
 
-      if (data.status === "done" || data.status === "error") {
+      if (data.status === "done" || data.status === "error" || data?.phase_1_status === "finished") {
         clearInterval(interval);
         setOpen(false);
-        setUrl(data.videoUrl);
+        console.log(`Url being set: :=> /videos/${data.filename}`);
+        setUrl(data?.s3_location || `/videos/${data.filename}`);
       }
     }, 1500);
 

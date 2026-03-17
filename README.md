@@ -1,22 +1,25 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 ---
 
-![Screenshot](assets/curator.png)
+![Curotator](assets/curator.png)
 
+![Process](assets/process.png)
+
+![Benchmark](assets/benchmark.png)
 
 
 ## Getting Started
 
-First, run the development server:
+Navigate to the `backend_flask_api`, execute:
+```bash
+pip3 install -r requirements.txt
+python3 app.py
+```
+
+then, in another tab, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+API_ENDPOINT=http://localhost:5002 LOCAL_DEV=true yarn run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

@@ -328,16 +328,16 @@ export default function CurateComp() {
   // ----- player renderers -----
   const renderExternal = () => (
     <ReactPlayer
-        ref={(r) => (playerRef.current = r)}
-        url={videoUrl}
-        playing={playing}
-        controls={false}
-        width="100%"
-        height="100%"
-        style={{ width: "100%", height: "100%" }}
-        onProgress={onPlayerProgress}
-        onDuration={onPlayerDuration}
-        />
+      ref={(r) => (playerRef.current = r)}
+      url={videoUrl}
+      playing={playing}
+      controls={false}
+      width="100%"
+      height="100%"
+      style={{ width: "100%", height: "100%" }}
+      onProgress={onPlayerProgress}
+      onDuration={onPlayerDuration}
+    />
 
   );
 
@@ -353,14 +353,14 @@ export default function CurateComp() {
 
   const renderNative = () => (
     <video
-        ref={videoRef}
-        src={videoUrl}
-        controls={false}
-        width="100%"
-        height="100%"
-        onTimeUpdate={onNativeTimeUpdate}
-        onLoadedMetadata={onNativeLoadedMetadata}
-        />
+      ref={videoRef}
+      src={videoUrl}
+      controls={false}
+      width="100%"
+      height="100%"
+      onTimeUpdate={onNativeTimeUpdate}
+      onLoadedMetadata={onNativeLoadedMetadata}
+    />
   );
 
   const labelsAutoComplete = annotations.reduce((acc, seg) => {
@@ -427,7 +427,6 @@ export default function CurateComp() {
     } else {
       deleteItem(videoUrl, null, index)
     }
-
   };
 
   const handleEditAnnotation = (updatedObj, index) => {
@@ -455,36 +454,6 @@ export default function CurateComp() {
     }
   };
 
-  const downloadYoutubeFile = () => {
-    const urlDownload = gameData.UrlLocal;
-
-
-    const debouncedLoad = useMemo(() => {
-        let timer = null;
-        return (q) => {
-          if (timer) clearTimeout(timer);
-          timer = setTimeout(async () => {
-            try {
-              setLoading(true);
-              latestQueryRef.current = q;
-              const data = await fetchOptions(q);
-              // only apply if this is the latest query
-              if (latestQueryRef.current === q) setOptions(data);
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(e);
-              setOptions([]);
-            } finally {
-              setLoading(false);
-            }
-          }, debounceMs);
-        };
-      }, [fetchOptions, debounceMs]);
-
-
-  }
-  
-
   return (
     <Container maxWidth="md" sx={{ mt: 4 }} style={{ background: "#fff"}}>
       <Typography variant="h4" gutterBottom>Video Tagging Tool</Typography>
@@ -500,17 +469,18 @@ export default function CurateComp() {
       </Snackbar>
       <div sx={{ mb: 2 }} style={{ gap: 20 }}>
         <BasicAutocomplete
-            options={files}
-            fullWidth
-            value={videoUrl}
-            label="Video URl"
-            placeholder="YouTube or direct .mp4/.webm/.ogg URL"
-            onChange={(v) => {
-              if (typeof v === "string") setVideoUrl(v);
-              else if (v?.value) setVideoUrl(v.value);
-            }}
+          options={files}
+          fullWidth
+          value={videoUrl}
+          label="Video URl"
+          placeholder="YouTube or direct .mp4/.webm/.ogg URL"
+          onChange={(v) => {
+            console.log(`[DEBUG] Changed url => ${v}`);
+            if (typeof v === "string") setVideoUrl(v);
+            else if (v?.value) setVideoUrl(v.value);
+          }}
         />
-        <DownloadButton videoUrl={videoUrl} setUrl={setVideoUrl}/>
+        <DownloadButton youtubeUrl={videoUrl} setUrl={setVideoUrl}/>
       </div>
       
 

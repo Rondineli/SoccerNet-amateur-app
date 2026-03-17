@@ -1,12 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
-import { loadJobs, saveJobs } from "./lib/downloadJobStatus";
-import { startDownload } from "./lib/downloadWorker";
+import { API_ENDPOINT } from "./lib/constants";
 
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  console.log(`Post received: ${JSON.stringify(req.body)}`)
 
   const { youtubeUrlOrId } = req.body;
 
@@ -14,24 +13,29 @@ export default function handler(req, res) {
     return res.status(400).json({ error: "Missing youtubeUrlOrId" });
   }
 
-  const jobId = uuidv4();
+  const videoUrl = youtubeUrlOrId.startsWith("http")
+    ? youtubeUrlOrId
+    : `https://www.youtube.com/watch?v=${youtubeUrlOrId}`;
 
-  const videoUrl = youtubeUrlOrId.videoUrl.startsWith("http")
-    ? youtubeUrlOrId.videoUrl
-    : `https://www.youtube.com/watch?v=${youtubeUrlOrId.videoUrl}`;
+  let data = {}
 
-  const jobs = loadJobs();
+  try {
+      const res = await fetch(`${API_ENDPOINT}/download`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ youtubeUrlOrId:  videoUrl})
+      });
+      if (!res.ok) {
+        throw new Error("Request failed");
+      }
+      data = await res.json();
+    } catch (err) {
+      console.log(err)
+      data = { status: "error", message: "Failed to fetch status" };
+    }
 
-  jobs[jobId] = {
-    id: jobId,
-    status: "pending",
-    progress: 0,
-    message: "Queued"
-  };
-
-  saveJobs(jobs);
-
-  startDownload(jobId, videoUrl);
-
-  return res.status(200).json({ jobId });
+  return res.status(200).json(data);
 }

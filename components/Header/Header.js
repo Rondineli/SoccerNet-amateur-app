@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { useAppContext } from "@/context/Context";
 
-import logoDark from "../../public/images/logo/black_logo_white_background__1bg.png"
-import logo from "../../public/images/logo/white_logo_black_background__1bg.png"
 
 import Nav from "./Nav";
 import DarkSwitch from "./dark-switch";
-import LanguageSwitcher from './SelectLanguage';
+
 
 const Header = ({ headerTransparent, headerSticky, menuText, btnClass }) => {
   const { activeMobileMenu, setActiveMobileMenu, isLightTheme, toggleTheme } =
     useAppContext();
   const [isSticky, setIsSticky] = useState(false);
-  const [width, setWidth] = useState(835);
-  const [height, setHeigth] = useState(100);
 
   useEffect(() => {
     const handleScroll = () => {

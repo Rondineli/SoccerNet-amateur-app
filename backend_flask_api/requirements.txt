@@ -1,0 +1,9 @@
+Flask==3.0.3
+Flask-Cors==5.0.0
+SoccerNet==0.1.62
+ffmpeg-python==0.2.0
+ffmpy==0.6.3
+imageio-ffmpeg==0.6.0
+yt-dlp==2025.7.21
+opencv-python==4.11.0.86
+paramiko==4.0.0
