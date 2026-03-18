@@ -17,12 +17,10 @@ import {
   Alert,
   Snackbar,
   Select,
-  MenuItem,
-  LinearProgress
+  MenuItem
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
-import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 import Modal from "@mui/material/Modal";
@@ -32,7 +30,7 @@ import { addSegment as saveSegment, getVideoSegments, deleteItem, editItem } fro
 import { BasicAutocomplete } from "./AutoComplete";
 import DownloadButton from "./DownloadButton";
 
-// ----- styles -----
+
 const playerShellStyle = {
     position: "relative",
     width: "100%",
@@ -197,10 +195,10 @@ export default function CurateComp() {
   // refs
   const playerRef = useRef(null);
   const videoRef  = useRef(null);
-  const recentTimeRef = useRef(0); // for react-player progress
-  const frameTimeRef = useRef(0);  // for frame-accurate native video
+  const recentTimeRef = useRef(0);
+  const frameTimeRef = useRef(0);
 
-  // ----- ReactPlayer events -----
+  // ReactPlayer events
   const onPlayerProgress = useCallback((state) => {
     if (!draggingRef.current && typeof state.playedSeconds === "number") {
       setCurrentTime(state.playedSeconds);
@@ -211,7 +209,7 @@ export default function CurateComp() {
     if (typeof sec === "number") setDuration(sec);
   }, []);
 
-  // ----- Native <video> events -----
+  // Native <video> events
   const onNativeTimeUpdate = () => {
     if (!draggingRef.current) {
       setCurrentTime(videoRef.current?.currentTime ?? 0);
@@ -325,7 +323,7 @@ export default function CurateComp() {
     URL.revokeObjectURL(url);
   };
 
-  // ----- player renderers -----
+  // player renderers
   const renderExternal = () => (
     <ReactPlayer
       ref={(r) => (playerRef.current = r)}
@@ -461,7 +459,7 @@ export default function CurateComp() {
         open={openAlert}
         autoHideDuration={3000} // auto close after 3s
         onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // position
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert onClose={handleClose} severity={openErrorAlert ? "error" :"success"} sx={{ width: "100%" }}>
           {openErrorAlert ? "Error to save event!" : "✅ Action completed successfully!"}

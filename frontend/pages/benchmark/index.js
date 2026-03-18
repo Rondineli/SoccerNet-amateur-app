@@ -148,8 +148,5 @@ export default function BenchMArkPage() {
         </Context>
       </main>
     </>
-
-
-
   );
 }

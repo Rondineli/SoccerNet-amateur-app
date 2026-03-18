@@ -17,6 +17,7 @@ CLOUDFRONT_DOMAIN = "https://d3tdwb735roscv.cloudfront.net/"
 
 
 def time_to_seconds(value):
+    """ Convert time from cli to seconds """
     if isinstance(value, str) and ":" in value:
         parts = [int(p) for p in value.split(":")]
         # MM:SS

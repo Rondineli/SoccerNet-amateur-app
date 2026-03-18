@@ -2,26 +2,30 @@ import json
 import os
 import glob
 import cv2
-from tqdm import tqdm
 import argparse
 
-# ================= CONFIG =================
+from typing import List
+from tqdm import tqdm
+
+
 VIDEO_PATH_ROOT = "/opt/projects/datasets/"
 OUTPUT_DIR = "context_frames"
 CONTEXT_OFFSETS_SEC = [-15, 0, 15]  # 5 screenshots
-# ==========================================
 
 
-def load_json(path):
+def load_json(path: str) -> dict:
+    """ Load local config file json """
     with open(path, "r") as f:
         return json.load(f)
 
 
-def strip_model_from_url(url):
+def strip_model_from_url(url: str) -> str:
+    """  Get url string and get the model name/location """
     return os.path.dirname(url)
 
 
-def find_video(video_dir):
+def find_video(video_dir: str) -> List:
+    """ Iterates over directory of the videos to find mp4 files"""
     mp4s = glob.glob(os.path.join(video_dir, "*.mp4"))
     if not mp4s:
         raise FileNotFoundError(f"No MP4 found in {video_dir}")
@@ -30,9 +34,8 @@ def find_video(video_dir):
     return mp4s[0]
 
 
-
-
-def extract_frames(video_path, event_ms, output_dir, label, confidence):
+def extract_frames(video_path: str, event_ms: str, output_dir: str, label: str, confidence: str) -> None:
+    """ Extract frames from results of the inference (json outputs) """
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -61,7 +64,7 @@ def extract_frames(video_path, event_ms, output_dir, label, confidence):
     
     cap.release()
 
-def main(args):
+def main(args: argparse) -> None:
     data = load_json(args.result_json_file)
 
     url = data["Url"]
@@ -81,7 +84,6 @@ def main(args):
         OUTPUT_DIR
     )
     print(f"output will be written in {output_dir_test}")
-    #return
 
     os.makedirs(output_dir_test, exist_ok=True)
 
@@ -112,7 +114,11 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--result-json-file", required=True, help="Path to SoccerNet json result to extract frames")
+    parser.add_argument(
+        "--result-json-file",
+        required=True,
+        help="Path to SoccerNet json result to extract frames"
+    )
     args = parser.parse_args()
 
     main(args)

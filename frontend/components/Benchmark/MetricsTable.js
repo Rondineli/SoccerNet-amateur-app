@@ -141,6 +141,7 @@ export default function MetricsTable({data, title, dataset}) {
     let lowest = null;
   
     Object.entries(_mapObjects).forEach(([label, models]) => {
+      // Find the lowest and highest mAP to print in the table
       models.forEach((model) => {
         // const value = model.loose?.Any || model.loose?.Unseen || model.loose?.Visible;
         let value;
@@ -180,8 +181,8 @@ export default function MetricsTable({data, title, dataset}) {
       <FetchModal dataset={dataset}/>
       <TableContainer component={Paper} sx={{ backgroundColor: "#fff" }}>
         <Table sx={{borderCollapse: 'separate'}}>
+        {/* HEADER (ROW) 1 */}
         <TableHead>
-          {/* HEADER ROW 1 */}
           <TableRow>
             <TableCell rowSpan={3}>
               <strong>Label</strong>
@@ -191,7 +192,7 @@ export default function MetricsTable({data, title, dataset}) {
               <TableCell
                 key={returnModelHumanTranslation(model)}
                 align="center"
-                colSpan={6}     // 🔥 span subcolumns
+                colSpan={6}
                 sx={{
                   borderLeft:
                     subIdx % 1 === 0 || subIdx === 0
@@ -210,7 +211,7 @@ export default function MetricsTable({data, title, dataset}) {
                 <TableCell
                   key={`${model}-${metric}`}
                   align="center"
-                  colSpan={3}     // 🔥 span subcolumns
+                  colSpan={3}
                   sx={{
                     borderLeft:
                       subIdx === 0
@@ -225,7 +226,7 @@ export default function MetricsTable({data, title, dataset}) {
             ))}
           </TableRow>
 
-          {/* HEADER ROW 2 */}
+          {/* HEADER (ROW) 2 */}
           <TableRow>
             {_mapColunms.map((model) => (
               <>

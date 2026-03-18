@@ -8,7 +8,6 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { Padding } from "@mui/icons-material";
 
 export default function FetchJsonModal({dataset, resultsData}) {
   const [open, setOpen] = useState(false);
@@ -50,8 +49,6 @@ export default function FetchJsonModal({dataset, resultsData}) {
         Open JSON benchmark
       </Button>
       {/*{resultsData}*/}
-
-
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
           sx={{

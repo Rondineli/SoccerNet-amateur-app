@@ -1,8 +1,6 @@
 const STORAGE_KEY = "video_segments";
 
-/* -----------------------------
-  Utils
------------------------------- */
+// Utils
 const buildKey = (videoUrl, segment) => {
   if (segment?.metadata) {
     return `segments_metadata_${videoUrl}`;
@@ -18,9 +16,7 @@ const safeParse = (value, fallback) => {
   }
 };
 
-/* -----------------------------
-  Gette methods
------------------------------- */
+// Gette methods
 export function getAllSegments() {
   if (typeof window === "undefined") return {};
   return safeParse(localStorage.getItem(STORAGE_KEY), {});
@@ -31,9 +27,7 @@ export const getVideoSegments = (videoUrl, key, defaultResponse = []) => {
   return safeParse(localStorage.getItem(storageKey), defaultResponse);
 };
 
-/* -----------------------------
-  Add method
------------------------------- */
+//Add method
 export const addSegment = (videoUrl, segment) => {
   const key = buildKey(videoUrl, segment);
   const existing = getVideoSegments(videoUrl, key, []);
@@ -47,9 +41,7 @@ export const addSegment = (videoUrl, segment) => {
   localStorage.setItem(key, JSON.stringify(existing));
 };
 
-/* -----------------------------
-  Edit method
------------------------------- */
+// Edit method
 export const editItem = (videoUrl, updatedItem, index = null) => {
   const key = buildKey(videoUrl, updatedItem);
   const existing = getVideoSegments(videoUrl, key, []);
@@ -69,9 +61,7 @@ export const editItem = (videoUrl, updatedItem, index = null) => {
   localStorage.setItem(key, JSON.stringify(updated));
 };
 
-/* -----------------------------
-  Delete function
------------------------------- */
+// Delete function
 export const deleteItem = (videoUrl, id = null, index = null) => {
   const key = `segments_${videoUrl}`;
   const existing = getVideoSegments(videoUrl, key, []);

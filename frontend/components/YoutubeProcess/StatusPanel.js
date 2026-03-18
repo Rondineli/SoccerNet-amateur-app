@@ -133,7 +133,7 @@ function VideosPage({videoUrls}) {
         ) : (
           <>
             <Typography variant="h6" style={{ color: "#fff", marginTop: "100px" }}>
-  Confidence Filter: {cutConfidence.toFixed(3)}
+              Confidence Filter: {cutConfidence.toFixed(3)}
             </Typography>
 
             <Slider
@@ -197,12 +197,9 @@ export default function StatusPanel({ loading, data, modelType}) {
 
   const [messages, setMessages] = useState(_messages);
   const [visibleIndex, setVisibleIndex] = useState(0);
-  const [iconIndex, setIconIndex] = useState("🔄");
-  const [currentIndex, setCurrentIndex] = useState(visibleIndex);
   const [width, setWidth] = useState(126);
   const [heitgh, setHeigth] = useState(258);
   const { isLightTheme } = useAppContext();
-  const [fade, setFadeState] = useState('fade-in');
   const [fadeState, setFade] = useState(false);
 
   const envModelSet = modelConfigTranslations[modelType];
@@ -273,8 +270,6 @@ export default function StatusPanel({ loading, data, modelType}) {
   if (!data) {
     return <></>;
   }
-
-  
 
   if ((data[envModelSet]?.s3_objects_list && data[envModelSet].s3_objects_list.length > 0) || data.status === "finished") {
     return (
