@@ -41,7 +41,6 @@ MODEL_CONFIGS = {
 os.makedirs(DBASE_PATH_JSON, exist_ok=True)
 
 def make_download_post_hook(job_id: Optional[bool] = False):
-    """ wrapper (decorator) for post hook from ydl interface """
     def download_post_hook(status: str) -> None:
         """
         Hook to be executed once video is downloaded
@@ -170,11 +169,29 @@ def start_download(url: str, download_only: Optional[bool] = False) -> None:
     print(f"[DEBUG] Downloading opts download_only: {download_only} | tmplt: {out_tmp}")
 
     ydl_opts = {
+        # Focring known formats to avoid errors in the pca feature extraction
+        # if not available, it should fail loudly
         "format": "best[ext=mp4][vcodec^=avc1]",
+        # mp4 format always - potentially avoiindg pca feature xtraction error 
         "merge_output_format": "mp4",
         "outtmpl": out_tmp,
         "progress_hooks": [make_download_ph_hook(download_only)],
-        "postprocessor_hook": [make_download_post_hook(download_only)]
+        "postprocessor_hook": [make_download_post_hook(download_only)],
+        # an auth file - to represente a real loggedin user - avoiding to not comply with use,
+        # terms and conditions of the platform
+        "cookiefile": "/OSL-ActionSpotting/cookies.txt",
+        "http_headers": {
+            # setting user agent to avoid randon blocks from youtube api
+            "User-Agent": "com.google.android.youtube/17.31.35 (Linux; U; Android 11)"
+        },
+        # forcing not load a browser content - this is a loggedin call, not an abuse api call
+        "cookiesfrombrowser": None,
+        "extractor_args": {
+             "youtube": {
+                  "player_client": ["web"]
+             }
+        },
+        "verbose": True
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
